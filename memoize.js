@@ -1,28 +1,25 @@
 const memo = (fn) => {
   const cache = new Map();
-
+  let callCount = 0;
   return function (...args) {
-    const key = JSON.stringify(args);
-    const cachedValue = cache.get(key);
-    if (cachedValue) return cachedValue;
+    const argumentsAsString = args.toString();
+
+    if (cache.has(argumentsAsString)) return cache.get(argumentsAsString);
     const value = fn(...args);
+
     cache.set(key, value);
+
+    callCount++;
+
     return value;
   };
 };
 
-const sum = memo((nums) => {
-  return nums.reduce(
-    (previousValue, currentValue) => (previousValue += currentValue),
-    0
-  );
+let callCount = 0;
+const memoizedFn = memo(function (a, b) {
+  callCount += 1;
+  return a + b;
 });
-
-// [[0,0],[0,0],[]]
-
-console.log(sum([0, 0]));
-console.log(sum([0, 0]));
-console.log(sum([]));
-// console.log(sum([20, 30]));
-// console.log(sum([10, 10]));
-// console.log(sum([10, 90, 30, 40, 50]));
+memoizedFn(2, 3); // 5
+memoizedFn(2, 3); // 5
+console.log(callCount); // 1
